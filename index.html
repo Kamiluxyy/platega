@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CoinLab Pay — Basic Plan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0a0a0f;
+      --panel:#12121c;
+      --accent:#a855f7;
+      --accent-2:#8b5cf6;
+      --muted:#9a7aff;
+      --radius:14px;
+    }
+    * { box-sizing:border-box; font-family:'Poppins',sans-serif; }
+    body {
+      margin:0; min-height:100vh;
+      background:radial-gradient(circle at 5% 10%, rgba(168,85,247,0.1) 0%, #0a0a0f 70%);
+      color:#f0e6ff;
+      display:flex; flex-direction:column; align-items:center;
+      padding:18px;
+    }
+    header {
+      width:100%; max-width:1100px;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:14px 20px;
+      background:linear-gradient(180deg,rgba(168,85,247,0.05),transparent);
+      border-radius:12px; margin-bottom:18px;
+      border:1px solid rgba(168,85,247,0.1);
+    }
+    .brand { font-family:'Orbitron',sans-serif; color:var(--accent); font-size:1.2rem; font-weight:700; }
+    .plan { 
+      background:linear-gradient(135deg, var(--accent), var(--accent-2)); 
+      padding:10px 14px; 
+      border-radius:10px; 
+      color:#0a0a0f; 
+      font-weight:700; 
+    }
+    main {
+      width:100%; max-width:1100px;
+      display:grid; grid-template-columns:1fr 1fr 360px;
+      gap:18px;
+    }
+    .panel {
+      background:linear-gradient(180deg, rgba(168,85,247,0.05), rgba(168,85,247,0.02));
+      border-radius:var(--radius);
+      padding:18px;
+      border:1px solid rgba(168,85,247,0.15);
+      box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    }
+    h2 { color:var(--accent); margin-top:0; margin-bottom:10px; }
+    .coins { display:flex; flex-direction:column; gap:12px; }
+    .coin {
+      display:flex; align-items:center; gap:12px;
+      padding:10px; border-radius:12px;
+      background:rgba(18,18,28,0.6); cursor:pointer;
+      border:1px solid rgba(168,85,247,0.1);
+      transition:all .18s ease;
+    }
+    .coin:hover { 
+      transform:translateY(-4px); 
+      box-shadow:0 8px 28px rgba(168,85,247,0.2);
+      border-color:rgba(168,85,247,0.3);
+    }
+    .coin.active { 
+      outline:2px solid rgba(168,85,247,0.3); 
+      background:rgba(168,85,247,0.1); 
+      border-color:rgba(168,85,247,0.3);
+    }
+    .coin img { width:38px; height:38px; border-radius:50%; }
+    .coin-name { font-weight:700; }
+    .coin-code { color:var(--muted); font-size:0.9rem; }
+    .qr-wrap { text-align:center; }
+    #qr-img { width:220px; height:220px; border-radius:10px; margin-bottom:10px; }
+    .addr-box {
+      background:rgba(168,85,247,0.08); 
+      border-radius:10px; 
+      padding:12px;
+      display:flex; 
+      align-items:center; 
+      justify-content:space-between;
+      margin-bottom:10px; 
+      word-break:break-all;
+      border:1px solid rgba(168,85,247,0.15);
+    }
+    .btn {
+      background:linear-gradient(135deg, var(--accent), var(--accent-2));
+      border:none;
+      color:#0a0a0f; 
+      padding:8px 12px; 
+      border-radius:10px;
+      cursor:pointer; 
+      font-weight:600; 
+      transition:.15s;
+    }
+    .btn:hover { 
+      transform:translateY(-3px); 
+      box-shadow:0 10px 20px rgba(168,85,247,0.4);
+    }
+    .note { color:var(--muted); font-size:0.85rem; margin-top:10px; }
+    .tx-info {
+      background:rgba(168,85,247,0.08);
+      border:1px solid rgba(168,85,247,0.15);
+      border-radius:10px;
+      padding:12px;
+      margin-top:15px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .tx-label {
+      font-weight:600;
+      color:var(--accent);
+    }
+    .tx-value {
+      font-weight:700;
+      color:#fff;
+      font-family:monospace;
+      font-size:1.1rem;
+    }
+    .toast {
+      position:fixed; 
+      bottom:25px; 
+      left:50%; 
+      transform:translateX(-50%);
+      background:rgba(18,18,28,0.9); 
+      color:#fff; 
+      padding:10px 14px;
+      border-radius:10px; 
+      z-index:999; 
+      font-weight:600;
+      border:1px solid rgba(168,85,247,0.2);
+      box-shadow:0 5px 15px rgba(0,0,0,0.5);
+    }
+    @media(max-width:900px){ main{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">CoinLab Pay</div>
+  <div class="plan">Basic Plan — 50.00 USD</div>
+</header>
+
+<main>
+  <!-- coins -->
+  <section class="panel">
+    <h2>Select coin</h2>
+    <div class="coins" id="coin-list">
+      <div class="coin" data-coin="BTC">
+        <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="BTC">
+        <div><div class="coin-name">Bitcoin</div><div class="coin-code">BTC</div></div>
+      </div>
+      <div class="coin" data-coin="ETH">
+        <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt="ETH">
+        <div><div class="coin-name">Ethereum</div><div class="coin-code">ETH</div></div>
+      </div>
+      <div class="coin" data-coin="TRX">
+        <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/trx.png" alt="TRX">
+        <div><div class="coin-name">Tron</div><div class="coin-code">TRX (TRC20)</div></div>
+      </div>
+      <div class="coin" data-coin="USDT">
+        <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png" alt="USDT">
+        <div><div class="coin-name">Tether</div><div class="coin-code">USDT (TRC20)</div></div>
+      </div>
+      <div class="coin" data-coin="SOL">
+        <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/sol.png" alt="SOL">
+        <div><div class="coin-name">Solana</div><div class="coin-code">SOL</div></div>
+      </div>
+      <div class="coin" data-coin="BNB">
+        <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png" alt="BNB">
+        <div><div class="coin-name">Binance</div><div class="coin-code">BNB</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QR -->
+  <section class="panel" id="qr-panel">
+    <h2>Payment</h2>
+    <div class="qr-wrap">
+      <img id="qr-img" src="" alt="QR">
+      <div class="addr-box">
+        <div>
+          <div>Address:</div>
+          <div id="addr-value" style="margin-top:4px;color:#fff;font-size:0.95rem;">—</div>
+        </div>
+        <button class="btn" id="copy-address">Copy</button>
+      </div>
+      <div class="addr-box">
+        <div>
+          <div>Amount:</div>
+          <div id="amount-value" style="margin-top:4px;color:#fff;font-size:0.95rem;">—</div>
+        </div>
+        <button class="btn" id="copy-amount">Copy</button>
+      </div>
+
+      <!-- Transaction ID Section -->
+      <div class="tx-info">
+        <div class="tx-label">Transaction ID:</div>
+        <div class="tx-value">15588778</div>
+        <button class="btn" id="copy-tx-id">Copy</button>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;">
+        <button class="btn" id="btn-download-qr">Download QR</button>
+        <button class="btn" id="btn-refresh-qr">Refresh QR</button>
+      </div>
+      <div class="note">Plan: <b>Basic</b> — 50.00 USD</div>
+    </div>
+  </section>
+
+  <!-- summary -->
+  <section class="panel">
+    <h2>Summary</h2>
+    <div>Selected coin: <span id="selected-coin" style="color:var(--accent);font-weight:700;">—</span></div>
+    <div style="margin-top:10px;">Total: <b>50.00 USD</b></div>
+    <div style="margin-top:12px;">
+      <button class="btn" id="btn-copy-all">Copy address & amount</button>
+    </div>
+    <div class="note">Select a coin to generate QR and payment info.</div>
+    <div class="note" style="margin-top:15px; background:rgba(168,85,247,0.05); padding:10px; border-radius:8px;">
+      <b>Important:</b> After payment, please save your transaction ID: <b>15588778</b> for verification.
+    </div>
+  </section>
+</main>
+
+<div id="toast-container"></div>
+
+<script>
+  // Сумма в USD для плана
+  const totalUSD = 50;
+
+  // Конфиг монет: адрес, ID на CoinGecko, символ и fallback-цена
+  const COIN_CONFIG = {
+    BTC: {
+      addr: 'bc1qwmzmksyre0splr7wjunx54xf3gthrsuqsuz528',
+      coingeckoId: 'bitcoin',
+      symbol: 'BTC',
+      decimals: 6,
+      fallbackPrice: 65000 // на случай, если API недоступно
+    },
+    ETH: {
+      addr: '0xDaE001a993bfF1BEA8253d78c9B25F036d5eb531',
+      coingeckoId: 'ethereum',
+      symbol: 'ETH',
+      decimals: 4,
+      fallbackPrice: 3500
+    },
+    TRX: {
+      // твой публичный TRX-адрес
+      addr: 'TJV7RVUKPxJ9D2rfs4tHNNTSVXVBuwco69',
+      coingeckoId: 'tron',
+      symbol: 'TRX',
+      decimals: 2,
+      fallbackPrice: 0.12
+    },
+    USDT: {
+      // тот же адрес (USDT TRC20 на Tron)
+      addr: 'TJV7RVUKPxJ9D2rfs4tHNNTSVXVBuwco69',
+      coingeckoId: 'tether',
+      symbol: 'USDT',
+      decimals: 2,
+      fallbackPrice: 1
+    },
+    SOL: {
+      addr: '3RNXyfPCTwePKwzqSnx1TDTcpN8nuUCcPrvq94AMJxz7',
+      coingeckoId: 'solana',
+      symbol: 'SOL',
+      decimals: 3,
+      fallbackPrice: 150
+    },
+    BNB: {
+      addr: 'bnb1h9z6vmfj4rx9wd8s7lns77cls0kcw95l5r307g',
+      coingeckoId: 'binancecoin',
+      symbol: 'BNB',
+      decimals: 3,
+      fallbackPrice: 600
+    }
+  };
+
+  // сюда сохраним актуальные цены с API
+  const PRICES = {};
+
+  const coins = document.querySelectorAll('.coin');
+  const qrImg = document.getElementById('qr-img');
+  const addrValue = document.getElementById('addr-value');
+  const amountValue = document.getElementById('amount-value');
+  const selectedCoinEl = document.getElementById('selected-coin');
+  const toastContainer = document.getElementById('toast-container');
+  let selected = null;
+
+  function toast(msg){
+    const t=document.createElement('div');
+    t.className='toast';
+    t.innerText=msg;
+    toastContainer.appendChild(t);
+    setTimeout(()=>t.remove(),1500);
+  }
+
+  function generateQR(data){
+    // QR по адресу кошелька
+    qrImg.src=`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data)}&size=400x400`;
+  }
+
+  // Получаем цены через CoinGecko Simple Price API
+  async function fetchPrices() {
+    try {
+      const ids = Object.values(COIN_CONFIG)
+        .map(c => c.coingeckoId)
+        .join(',');
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Price API error');
+      const data = await res.json();
+
+      for (const [symbol, cfg] of Object.entries(COIN_CONFIG)) {
+        const id = cfg.coingeckoId;
+        if (data[id] && data[id].usd) {
+          PRICES[symbol] = data[id].usd;
+        }
+      }
+      console.log('Live prices loaded:', PRICES);
+    } catch (e) {
+      console.error('Failed to load live prices, using fallback', e);
+      // если не получилось — просто останемся на fallbackPrice
+    }
+  }
+
+  // вычисление текста Amount для конкретной монеты
+  function getAmountText(symbol) {
+    const cfg = COIN_CONFIG[symbol];
+    const price = PRICES[symbol] || cfg.fallbackPrice;
+    const amount = totalUSD / price;
+    return amount.toFixed(cfg.decimals) + ' ' + cfg.symbol;
+  }
+
+  coins.forEach(c=>{
+    c.addEventListener('click',()=>{
+      coins.forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      selected=c.dataset.coin;
+      const cfg = COIN_CONFIG[selected];
+      addrValue.textContent = cfg.addr;
+      amountValue.textContent = getAmountText(selected);
+      selectedCoinEl.textContent = selected;
+      generateQR(cfg.addr);
+    });
+  });
+
+  document.getElementById('copy-address').onclick=()=>{
+    if(!selected) return toast('Select coin');
+    navigator.clipboard.writeText(COIN_CONFIG[selected].addr);
+    toast('Address copied');
+  };
+  document.getElementById('copy-amount').onclick=()=>{
+    if(!selected) return toast('Select coin');
+    navigator.clipboard.writeText(getAmountText(selected));
+    toast('Amount copied');
+  };
+  document.getElementById('copy-tx-id').onclick=()=>{
+    navigator.clipboard.writeText('15588778');
+    toast('Transaction ID copied');
+  };
+  document.getElementById('btn-copy-all').onclick=()=>{
+    if(!selected) return toast('Select coin');
+    const cfg = COIN_CONFIG[selected];
+    const text = `${cfg.addr} | ${getAmountText(selected)} | TX:15588778`;
+    navigator.clipboard.writeText(text);
+    toast('Copied all');
+  };
+  document.getElementById('btn-refresh-qr').onclick=()=>{
+    if(!selected) return toast('Select coin');
+    const cfg = COIN_CONFIG[selected];
+    generateQR(cfg.addr + '?t=' + Date.now());
+    toast('QR refreshed');
+  };
+  document.getElementById('btn-download-qr').onclick=()=>{
+    if(!selected) return toast('Select coin');
+    const a=document.createElement('a');
+    a.href=qrImg.src;
+    a.download=`${selected}_qr.png`;
+    a.click();
+    toast('Download started');
+  };
+
+  // При загрузке страницы сразу пытаемся подтянуть актуальные курсы
+  fetchPrices();
+</script>
+</body>
+</html>
